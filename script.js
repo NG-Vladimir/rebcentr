@@ -1,3 +1,4 @@
+// БУРГЕР-МЕНЮ
 const burger = document.getElementById("burger");
 const menu = document.getElementById("menuPanel");
 const closeBtn = document.getElementById("closeMenu");
@@ -14,27 +15,17 @@ closeBtn.addEventListener("click", () => {
   closeBtn.classList.remove("active");
 });
 
-/* -------- FIX Mobile VH -------- */
-function setVh() {
-  let vh = window.innerHeight * 0.01;
-  document.documentElement.style.setProperty("--vh", `${vh}px`);
-}
-setVh();
-window.addEventListener("resize", setVh);
-
-/* -------- Typewriter Effect -------- */
-const text = "«Путь Свободы»";
+// ПЕЧАТНЫЙ ЭФФЕКТ ДЛЯ HERO H1
+const typedText = document.getElementById("typed-text");
+const text = "Благотворительная учреждение по социальной адаптации алко-наркозависимых";
 let index = 0;
-const speed = 90;
 
-function typeEffect() {
+function type() {
   if (index < text.length) {
-    document.getElementById("typeTitle").textContent += text.charAt(index);
+    typedText.innerHTML += text.charAt(index);
     index++;
-    setTimeout(typeEffect, speed);
+    setTimeout(type, 50); // скорость печати
   }
 }
 
-window.addEventListener("load", () => {
-  setTimeout(typeEffect, 500);
-});
+window.addEventListener("load", type);
