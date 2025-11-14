@@ -1,54 +1,63 @@
 /* -----------------------------
-   ГЛОБАЛЬНЫЙ ФОН
+   ГЛОБАЛЬНЫЙ ФОН (Градиент + Туман + Шум)
 -------------------------------- */
 body {
   margin: 0;
-  font-family: "Inter", sans-serif;
+  min-height: 100vh; /* адаптивнее для мобил */
   overflow-x: hidden;
+  overflow-y: auto;
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(
+    to bottom,
+    #8aa3c1 0%,
+    #6f829e 35%,
+    #4a566d 65%,
+    #2c3443 100%
+  );
   position: relative;
+  -webkit-font-smoothing: antialiased;
 }
 
+/* Анимированный туман */
 body::before {
   content: "";
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(to bottom, #8aa3c1, #6f829e, #4a566d, #2c3443);
-  z-index: -3;
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  top: -15%;
+  bottom: -15%;
+  background: radial-gradient(circle at 40% 50%, rgba(255,255,255,0.12), transparent 70%);
+  animation: fogMove 22s ease-in-out infinite;
+  filter: blur(60px); /* уменьшено для мобильных */
+  opacity: 0.6;
+  pointer-events: none;
+  will-change: transform; /* GPU оптимизация */
 }
 
+/* Шум */
 body::after {
   content: "";
-  position: fixed;
+  position: absolute;
   inset: 0;
   background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-  opacity: 0.07;
   mix-blend-mode: overlay;
-  z-index: -2;
+  opacity: 0.05; /* снижено для плавности */
+  pointer-events: none;
 }
 
-/* Туман */
-.fog {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%);
-  filter: blur(100px);
-  animation: fogMove 22s infinite ease-in-out;
-  opacity: 0.7;
-  z-index: -1;
-}
-
+/* Анимация тумана */
 @keyframes fogMove {
-  0% { transform: translate(0,0) scale(1); }
-  40% { transform: translate(-4%, 5%) scale(1.15); }
-  75% { transform: translate(6%, -4%) scale(1.1); }
+  0%   { transform: translate(0,0) scale(1); }
+  40%  { transform: translate(-4%, 5%) scale(1.05); }
+  75%  { transform: translate(6%, -4%) scale(1.05); }
   100% { transform: translate(0,0) scale(1); }
 }
 
 /* -----------------------------
-      HERO
+      HERO — ВСЕ ПО ЦЕНТРУ
 -------------------------------- */
 .hero {
-  min-height: calc(var(--vh, 1vh) * 100);
+  min-height: 100vh; /* адаптируем к мобильным адресным строкам */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -56,42 +65,32 @@ body::after {
   padding: 0 20px;
   text-align: center;
   color: white;
+  position: relative;
+  z-index: 2;
 }
 
 .hero h1 {
   font-size: 20px;
   max-width: 330px;
+  font-weight: 400;
   margin-bottom: 10px;
 }
 
-/* TYPEWRITER */
-.typewriter {
+.hero h2 {
   font-size: 28px;
+  margin-bottom: 40px;
   font-weight: 600;
-  color: white;
-  display: inline-block;
-  border-right: 3px solid rgba(255,255,255,0.6);
-  white-space: nowrap;
-  overflow: hidden;
-  padding-right: 5px;
-  animation: cursorBlink 0.7s infinite;
-}
-
-@keyframes cursorBlink {
-  0% { border-color: rgba(255,255,255,0.6); }
-  50% { border-color: transparent; }
-  100% { border-color: rgba(255,255,255,0.6); }
 }
 
 /* -----------------------------
       GLASS BUTTON
 -------------------------------- */
 .glass-btn {
-  margin-top: 40px;
   padding: 14px 32px;
   border-radius: 40px;
-  color: white;
   text-decoration: none;
+  color: white;
+  font-size: 16px;
   backdrop-filter: blur(14px);
   background: rgba(255,255,255,0.15);
   border: 1px solid rgba(255,255,255,0.3);
@@ -100,30 +99,27 @@ body::after {
 }
 
 .glass-btn:hover {
-  transform: scale(1.05);
+  background: rgba(255,255,255,0.22);
+  transform: scale(1.03);
 }
 
 /* -----------------------------
-      BURGER
+      BURGER ICON
 -------------------------------- */
 .burger {
   position: fixed;
-  top: 32px;
-  right: 24px;
+  top: 40px; /* немного ниже */
+  right: 20px; /* чуть левее */
   width: 32px;
   height: 22px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
-  z-index: 20;
-}
-
-.burger span {
-  width: 100%;
-  height: 3px;
-  background: white;
-  border-radius: 3px;
+  z-index: 11;
+  transition: 0.3s;
+  transform: translateZ(0); /* GPU оптимизация */
+  backface-visibility: hidden;
 }
 
 .burger.hidden {
@@ -131,18 +127,29 @@ body::after {
   pointer-events: none;
 }
 
-/* CLOSE BUTTON */
+.burger span {
+  height: 3px;
+  width: 100%;
+  background: white;
+  border-radius: 3px;
+}
+
+/* -----------------------------
+      CLOSE (Крестик)
+-------------------------------- */
 .close-btn {
   position: fixed;
-  top: 28px;
-  right: 20px;
+  right: 26px;
+  top: 22px;
   font-size: 32px;
   color: white;
   cursor: pointer;
-  z-index: 21;
+  z-index: 12;
   opacity: 0;
   pointer-events: none;
   transition: 0.3s;
+  transform: translateZ(0); /* GPU оптимизация */
+  backface-visibility: hidden;
 }
 
 .close-btn.active {
@@ -151,30 +158,31 @@ body::after {
 }
 
 /* -----------------------------
-      MENU PANEL
+      FULLSCREEN MENU PANEL
 -------------------------------- */
 .menu-panel {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(12px); /* меньше для мобильных */
   transform: translateY(-100%);
   opacity: 0;
   transition: 0.5s ease;
-  z-index: 19;
+  z-index: 10;
 }
 
 .menu-panel.active {
-  transform: translateY(0);
+  transform: translateY(0%);
   opacity: 1;
 }
 
+/* Ссылки */
 .menu-links {
-  margin-top: 150px;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  margin-top: 140px;
   text-align: center;
+  gap: 28px;
 }
 
 .menu-links a {
@@ -182,6 +190,7 @@ body::after {
   color: white;
   text-decoration: none;
   opacity: 0;
+  transform: translateY(20px);
   animation: fadeIn 0.7s forwards;
 }
 
@@ -191,43 +200,20 @@ body::after {
 .menu-links a:nth-child(4) { animation-delay: 0.65s; }
 
 @keyframes fadeIn {
-  to { opacity: 1; }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* -----------------------------
-   ВТОРОЙ БЛОК
+      Адаптив для мобильных
 -------------------------------- */
-.second-block {
-  background: white;
-  padding: 80px 20px;
-  text-align: center;
-}
-
-.second-block h2 {
-  font-size: 26px;
-  margin-bottom: 16px;
-}
-
-.second-block p {
-  font-size: 18px;
-  margin-bottom: 32px;
-}
-
-/* -----------------------------
-   БЛОК С КАРТИНКОЙ
--------------------------------- */
-.image-block {
-  background: #f5f5f5;
-  padding: 60px 20px;
-}
-
-.image-block img {
-  width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-  transition: 0.3s;
-}
-
-.image-block img:hover {
-  transform: scale(1.02);
+@media (max-width: 768px) {
+  body::before { filter: blur(50px); opacity: 0.5; }
+  body::after { opacity: 0.03; }
+  .hero h1 { font-size: 18px; max-width: 280px; }
+  .hero h2 { font-size: 24px; }
+  .glass-btn { padding: 12px 28px; font-size: 14px; }
+  .menu-links a { font-size: 22px; }
 }
