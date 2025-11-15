@@ -4,7 +4,388 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Путь Свободы</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    /* СБРОС И ОСНОВНЫЕ СТИЛИ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      overflow-x: hidden;
+      width: 100%;
+      position: relative;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      width: 100%;
+      font-family: "Inter", sans-serif;
+      background: linear-gradient(to bottom, #8aa3c1 0%, #6f829e 35%, #4a566d 65%, #2c3443 100%);
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ЛЕГКАЯ АНИМАЦИЯ ФОНА БЕЗ ПОДЕРГИВАНИЙ */
+    body::before {
+      content: "";
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 40% 50%, rgba(255,255,255,0.1), transparent 60%);
+      animation: gentleMove 30s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes gentleMove {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.6; }
+    }
+
+    /* -----------------------------
+          HERO
+    --------------------------------- */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 0 20px;
+      text-align: center;
+      color: white;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* "Путь Свободы" - большой заголовок */
+    .hero h1 {
+      font-size: 42px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      line-height: 1.2;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    /* Описание - с печатным эффектом */
+    .hero h2 {
+      font-size: 20px;
+      max-width: 330px;
+      font-weight: 400;
+      margin-bottom: 40px;
+      line-height: 1.4;
+      min-height: 60px;
+      text-shadow: 0 1px 5px rgba(0,0,0,0.3);
+    }
+
+    .glass-btn {
+      padding: 14px 32px;
+      border-radius: 40px;
+      text-decoration: none;
+      color: white;
+      font-size: 16px;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .glass-btn:hover {
+      background: rgba(255,255,255,0.22);
+      transform: scale(1.03);
+    }
+
+    /* -----------------------------
+          BURGER МЕНЮ - ИСПРАВЛЕНО
+    --------------------------------- */
+    .burger {
+      position: fixed;
+      top: 30px;
+      right: 20px;
+      width: 32px;
+      height: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+    }
+
+    .burger.hidden { 
+      opacity: 0; 
+      pointer-events: none; 
+    }
+
+    .burger span { 
+      height: 3px; 
+      width: 100%; 
+      background: white; 
+      border-radius: 3px; 
+      transition: all 0.3s ease;
+    }
+
+    .close-btn {
+      position: fixed;
+      right: 20px;
+      top: 20px;
+      font-size: 32px;
+      color: white;
+      cursor: pointer;
+      z-index: 1002;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-btn.active { 
+      opacity: 1; 
+      pointer-events: auto; 
+    }
+
+    /* ШТОРКА МЕНЮ - ФИКСИРОВАННАЯ */
+    .menu-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(10px);
+      transform: translateX(100%);
+      transition: transform 0.4s ease;
+      z-index: 1001;
+      overflow: hidden;
+    }
+
+    .menu-panel.active { 
+      transform: translateX(0%); 
+    }
+
+    /* ЗАПРЕТ СКРОЛЛА КОГДА МЕНЮ ОТКРЫТО */
+    body.menu-open {
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+    }
+
+    .menu-links {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      text-align: center;
+      gap: 30px;
+      padding: 20px;
+    }
+
+    .menu-links a {
+      font-size: 26px;
+      color: white;
+      text-decoration: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s ease;
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+
+    .menu-panel.active .menu-links a {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .menu-panel.active .menu-links a:nth-child(1) { transition-delay: 0.1s; }
+    .menu-panel.active .menu-links a:nth-child(2) { transition-delay: 0.2s; }
+    .menu-panel.active .menu-links a:nth-child(3) { transition-delay: 0.3s; }
+    .menu-panel.active .menu-links a:nth-child(4) { transition-delay: 0.4s; }
+
+    .menu-links a:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* -----------------------------
+          ТЕКСТОВЫЙ БЛОК - БЕЛЫЙ ФОН
+    --------------------------------- */
+    .text-block {
+      background: #ffffff;
+      padding: 60px 20px;
+      color: #2c3443;
+      text-align: left;
+      position: relative;
+      z-index: 2;
+    }
+
+    .text-block .container { 
+      max-width: 800px; 
+      margin: 0 auto; 
+      width: 100%;
+    }
+
+    .text-block p { 
+      margin-bottom: 24px; 
+      line-height: 1.6; 
+      font-size: 16px; 
+    }
+
+    /* -----------------------------
+          БЛОК С ИЗОБРАЖЕНИЕМ
+    --------------------------------- */
+    .image-block { 
+      position: relative;
+      z-index: 2;
+      background: #ffffff;
+    }
+
+    .image-block .container { 
+      max-width: 800px; 
+      margin: 0 auto; 
+      text-align: center;
+      padding: 60px 20px;
+      width: 100%;
+    }
+
+    .image-block img { 
+      width: 100%; 
+      height: auto; 
+      border-radius: 12px; 
+      display: block;
+      max-width: 100%;
+    }
+
+    /* -----------------------------
+          БЛОК С ВИДЕО
+    --------------------------------- */
+    .video-block { 
+      position: relative;
+      z-index: 2;
+      background: #ffffff;
+      padding: 60px 20px;
+    }
+
+    .video-block .container { 
+      max-width: 800px; 
+      margin: 0 auto; 
+      width: 100%;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* Соотношение 16:9 */
+      height: 0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* -----------------------------
+          АДАПТИВ ДЛЯ ТЕЛЕФОНОВ
+    --------------------------------- */
+    @media (max-width: 768px) {
+      .hero h1 { 
+        font-size: 32px; 
+        margin-bottom: 15px;
+      }
+      
+      .hero h2 { 
+        font-size: 18px; 
+        max-width: 280px; 
+        margin-bottom: 30px;
+        min-height: 50px;
+      }
+      
+      .glass-btn { 
+        padding: 12px 28px; 
+        font-size: 15px; 
+      }
+      
+      .menu-links a { 
+        font-size: 22px; 
+      }
+      
+      .text-block { 
+        padding: 40px 15px; 
+      }
+      
+      .image-block .container {
+        padding: 40px 15px;
+      }
+      
+      .video-block { 
+        padding: 40px 15px; 
+      }
+      
+      .burger {
+        top: 25px;
+        right: 15px;
+      }
+      
+      .close-btn {
+        right: 15px;
+        top: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { 
+        font-size: 28px; 
+      }
+      
+      .hero h2 { 
+        font-size: 16px; 
+        max-width: 250px;
+      }
+      
+      .glass-btn { 
+        padding: 11px 24px; 
+        font-size: 14px; 
+      }
+      
+      .menu-links a { 
+        font-size: 20px; 
+      }
+      
+      .text-block { 
+        padding: 30px 15px; 
+      }
+      
+      .image-block .container {
+        padding: 30px 15px;
+      }
+      
+      .video-block { 
+        padding: 30px 15px; 
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -55,6 +436,82 @@
     </div>
   </section>
 
-  <script src="script.js"></script>
+  <!-- НОВЫЙ БЛОК С ВИДЕО -->
+  <section class="video-block">
+    <div class="container">
+      <div class="video-wrapper">
+        <iframe 
+          src="https://www.youtube.com/embed/au-24-TABXs" 
+          title="Видео о центре Путь Свободы" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // БУРГЕР-МЕНЮ
+    const burger = document.getElementById("burger");
+    const menu = document.getElementById("menuPanel");
+    const closeBtn = document.getElementById("closeMenu");
+    const menuLinks = document.querySelectorAll('.menu-links a');
+    const body = document.body;
+
+    // Функции управления меню
+    function openMenu() {
+      menu.classList.add("active");
+      burger.classList.add("hidden");
+      closeBtn.classList.add("active");
+      body.classList.add("menu-open");
+    }
+
+    function closeMenu() {
+      menu.classList.remove("active");
+      burger.classList.remove("hidden");
+      closeBtn.classList.remove("active");
+      body.classList.remove("menu-open");
+    }
+
+    // Инициализация меню
+    if (burger && menu && closeBtn) {
+      burger.addEventListener("click", openMenu);
+      closeBtn.addEventListener("click", closeMenu);
+      
+      menuLinks.forEach(link => {
+        link.addEventListener('click', closeMenu);
+      });
+      
+      menu.addEventListener('click', (e) => {
+        if (e.target === menu) {
+          closeMenu();
+        }
+      });
+    }
+
+    // ПЕЧАТНЫЙ ЭФФЕКТ
+    const typedText = document.getElementById("typed-text");
+    const text = "Благотворительное учреждение по социальной адаптации алко-наркозависимых";
+    let index = 0;
+
+    function type() {
+      if (!typedText) return;
+      
+      if (index < text.length) {
+        typedText.textContent += text.charAt(index);
+        index++;
+        setTimeout(type, 50);
+      }
+    }
+
+    // Запуск когда страница полностью готова
+    window.addEventListener("load", function() {
+      if (typedText) {
+        typedText.textContent = "";
+        type();
+      }
+    });
+  </script>
 </body>
 </html>
